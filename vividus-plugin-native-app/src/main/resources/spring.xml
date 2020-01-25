@@ -1,17 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xmlns:context="http://www.springframework.org/schema/context"
     xmlns:util="http://www.springframework.org/schema/util"
        xsi:schemaLocation="
         http://www.springframework.org/schema/beans https://www.springframework.org/schema/beans/spring-beans.xsd
-        http://www.springframework.org/schema/context https://www.springframework.org/schema/context/spring-context.xsd
         http://www.springframework.org/schema/util https://www.springframework.org/schema/util/spring-util.xsd"
-        default-lazy-init="true" profile="web">
+        default-lazy-init="true" profile="native">
 
-    <context:component-scan base-package=""/>
+    <bean id="applicationSteps" class="org.vividus.bdd.steps.ApplicationSteps" />
 
-    <util:list id="stepBeanNames-WebUi" value-type="java.lang.String">
-        <value></value>
+    <util:list id="stepBeanNames-Native" value-type="java.lang.String">
+        <value>applicationSteps</value>
     </util:list>
- </beans>
+</beans>

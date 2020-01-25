@@ -28,4 +28,5 @@ public interface SauceLabsCapabilityType
     String DEVICE = "device";
     String CAPABILITIES = "capabilities";
     String SELENIUM_VERSION = "seleniumVersion";
+    String APP = "app";
 }
