@@ -1,0 +1,6 @@
+project.description = 'Vividus plugin for testing native applications'
+
+dependencies {
+    implementation project(':vividus-extension-selenium')
+    implementation project(':vividus-bdd-engine')
+}

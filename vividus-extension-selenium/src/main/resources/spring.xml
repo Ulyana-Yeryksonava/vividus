@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="
+        http://www.springframework.org/schema/beans https://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/context https://www.springframework.org/schema/context/spring-context.xsd
+        http://www.springframework.org/schema/util https://www.springframework.org/schema/util/spring-util.xsd"
+        default-lazy-init="true" profile="web">
+
+    <bean id="webDriverProvider" class="org.vividus.selenium.WebDriverProvider"
+          destroy-method="destroy">
+        <property name="vividusWebDriverFactory">
+            <bean class="org.vividus.selenium.VividusWebDriverFactory">
+                <property name="remoteExecution" value="${selenium.grid.enabled}" />
+                <property name="webDriverEventListeners" ref="webDriverEventListener-EventHandlers" />
+            </bean>
+        </property>
+        <property name="testContext" ref="testContext" />
+    </bean>
+
+    <bean id="webDriverManagerContext" class="org.vividus.selenium.WebDriverManagerContext" />
+
+    <bean id="proxy" class="org.vividus.proxy.ThreadedProxy" />
+
+    <bean id="proxyServerFactory" class="org.vividus.proxy.ProxyServerFactory">
+        <property name="trustAllServers" value="${proxy.trust-all-servers}" />
+        <property name="advancedHostResolver">
+            <bean class="org.vividus.proxy.dns.HostNameResolver">
+                <property name="dnsMappingStorage" ref="localDnsStorage" />
+            </bean>
+        </property>
+        <property name="captureTypes" value="${proxy.capture-types}"/>
+    </bean>
+
+    <bean id="timeoutConfigurer" class="org.vividus.selenium.TimeoutConfigurer">
+        <property name="pageLoadTimeout" value="${selenium.timeout.page-load-timeout}" />
+        <property name="pageLoadTimeoutTimeUnit" value="${selenium.timeout.page-load-timeout-unit}" />
+        <property name="asyncScriptTimeout" value="${selenium.timeout.async-script-timeout}" />
+        <property name="asyncScriptTimeoutTimeUnit" value="${selenium.timeout.async-script-timeout-unit}" />
+    </bean>
+
+    <bean id="webDriverFactory" class="org.vividus.selenium.WebDriverFactory">
+        <property name="webDriverType" value="${selenium.browser}" />
+        <property name="remoteDriverUrl" value="${selenium.grid.url}" />
+        <property name="jsonUtils" ref="jsonUtils-LowerCamelCase" />
+    </bean>
+
+    <bean id="remoteWebDriverFactory" class="org.vividus.selenium.RemoteWebDriverFactory" />
+
+    <bean id="webDriverManager" class="org.vividus.selenium.manager.WebDriverManager">
+        <property name="nativeApp" value="${mobile-native-app}" />
+    </bean>
+ </beans>

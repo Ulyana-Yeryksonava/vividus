@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.vividus.ui.web.event;
+package org.vividus.selenium.event;
 
 import org.openqa.selenium.WebDriver;
 
