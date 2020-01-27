@@ -7,7 +7,9 @@
         http://www.springframework.org/schema/util https://www.springframework.org/schema/util/spring-util.xsd"
         default-lazy-init="true" profile="native">
 
-    <bean id="applicationSteps" class="org.vividus.bdd.steps.ApplicationSteps" />
+    <bean id="applicationSteps" class="org.vividus.bdd.steps.ApplicationSteps" >
+        <constructor-arg index="0" ref="jsonUtils-LowerCamelCase"/>
+    </bean>
 
     <util:list id="stepBeanNames-Native" value-type="java.lang.String">
         <value>applicationSteps</value>
