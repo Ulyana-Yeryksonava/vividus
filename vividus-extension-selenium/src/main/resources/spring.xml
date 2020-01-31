@@ -7,16 +7,16 @@
         http://www.springframework.org/schema/beans https://www.springframework.org/schema/beans/spring-beans.xsd
         http://www.springframework.org/schema/context https://www.springframework.org/schema/context/spring-context.xsd
         http://www.springframework.org/schema/util https://www.springframework.org/schema/util/spring-util.xsd"
-        default-lazy-init="true" profile="web">
+        default-lazy-init="true">
+
+    <bean id="parentVividusDriverFactory" class="org.vividus.selenium.AbstractVividusDriverFactory"
+          abstract="true" >
+        <property name="remote" value="${proxy.remote}" />
+    </bean>
 
     <bean id="webDriverProvider" class="org.vividus.selenium.WebDriverProvider"
           destroy-method="destroy">
-        <property name="vividusWebDriverFactory">
-            <bean class="org.vividus.selenium.VividusWebDriverFactory">
-                <property name="remoteExecution" value="${selenium.grid.enabled}" />
-                <property name="webDriverEventListeners" ref="webDriverEventListener-EventHandlers" />
-            </bean>
-        </property>
+        <property name="vividusDriverFactory" ref="vividusDriverFactory" />
         <property name="testContext" ref="testContext" />
     </bean>
 

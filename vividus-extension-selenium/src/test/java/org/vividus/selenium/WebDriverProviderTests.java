@@ -46,7 +46,7 @@ class WebDriverProviderTests
     private final TestContext testContext = new SimpleTestContext();
 
     @Mock
-    private VividusWebDriverFactory vividusWebDriverFactory;
+    private IVividusDriverFactory vividusDriverFactory;
 
     @Mock
     private RemoteWebDriver driver;
@@ -100,7 +100,7 @@ class WebDriverProviderTests
     void testDestroy()
     {
         Mockito.doNothing().when(mockedEventBus).post(any(WebDriverCreateEvent.class));
-        when(vividusWebDriverFactory.create()).thenReturn(vividusWebDriver);
+        when(vividusDriverFactory.create()).thenReturn(vividusWebDriver);
         when(vividusWebDriver.getWrappedDriver()).thenReturn(driver);
         webDriverProvider.get();
         webDriverProvider.destroy();

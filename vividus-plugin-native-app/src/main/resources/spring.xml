@@ -11,6 +11,9 @@
         <constructor-arg index="0" ref="jsonUtils-LowerCamelCase"/>
     </bean>
 
+    <bean id="vividusDriverFactory" class="org.vividus.selenium.VividusMobileAppDriverFactory"
+          parent="parentVividusDriverFactory" />
+
     <util:list id="stepBeanNames-Native" value-type="java.lang.String">
         <value>applicationSteps</value>
     </util:list>

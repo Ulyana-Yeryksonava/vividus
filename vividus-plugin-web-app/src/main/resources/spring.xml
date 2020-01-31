@@ -367,6 +367,12 @@
         </property>
     </bean>
 
+    <bean id="vividusDriverFactory" class="org.vividus.selenium.VividusWebDriverFactory"
+          parent="parentVividusDriverFactory" >
+        <property name="remoteExecution" value="${selenium.grid.enabled}" />
+        <property name="webDriverEventListeners" ref="webDriverEventListener-EventHandlers" />
+    </bean>
+
     <util:list id="stepBeanNames-WebUi" value-type="java.lang.String">
         <value>alertSteps</value>
         <value>cookieSteps</value>

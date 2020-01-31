@@ -29,7 +29,7 @@ import org.vividus.testcontext.TestContext;
 
 public class WebDriverProvider implements IWebDriverProvider
 {
-    private IVividusWebDriverFactory vividusWebDriverFactory;
+    private IVividusDriverFactory vividusDriverFactory;
     private final ConcurrentLinkedQueue<WebDriver> webDrivers = new ConcurrentLinkedQueue<>();
     @Inject private EventBus eventBus;
     private TestContext testContext;
@@ -51,7 +51,7 @@ public class WebDriverProvider implements IWebDriverProvider
         VividusWebDriver vividusWebDriver = testContext.get(VividusWebDriver.class);
         if (vividusWebDriver == null)
         {
-            vividusWebDriver = vividusWebDriverFactory.create();
+            vividusWebDriver = vividusDriverFactory.create();
             testContext.put(VividusWebDriver.class, vividusWebDriver);
             WebDriver driver = vividusWebDriver.getWrappedDriver();
             webDrivers.add(driver);
@@ -105,9 +105,9 @@ public class WebDriverProvider implements IWebDriverProvider
         webDrivers.forEach(WebDriver::quit);
     }
 
-    public void setVividusWebDriverFactory(IVividusWebDriverFactory vividusWebDriverFactory)
+    public void setVividusDriverFactory(IVividusDriverFactory vividusDriverFactory)
     {
-        this.vividusWebDriverFactory = vividusWebDriverFactory;
+        this.vividusDriverFactory = vividusDriverFactory;
     }
 
     public void setTestContext(TestContext testContext)
