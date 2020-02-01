@@ -33,6 +33,7 @@ import org.vividus.selenium.manager.WebDriverManager;
 
 public class VividusWebDriverFactory extends AbstractVividusDriverFactory
 {
+    @Inject private IWebDriverFactory webDriverFactory;
     @Inject private IBrowserWindowSizeProvider browserWindowSizeProvider;
     private boolean remoteExecution;
     private List<WebDriverEventListener> webDriverEventListeners;
@@ -42,8 +43,8 @@ public class VividusWebDriverFactory extends AbstractVividusDriverFactory
     {
         DesiredCapabilities capabilities = vividusWebDriver.getDesiredCapabilities();
         WebDriver webDriver = remoteExecution
-                ? getWebDriverFactory().getRemoteWebDriver(capabilities)
-                : getWebDriverFactory().getWebDriver((String) capabilities.getCapability(CapabilityType.BROWSER_NAME),
+                ? webDriverFactory.getRemoteWebDriver(capabilities)
+                : webDriverFactory.getWebDriver((String) capabilities.getCapability(CapabilityType.BROWSER_NAME),
                         capabilities);
 
         EventFiringWebDriver eventFiringWebDriver = new EventFiringWebDriver(webDriver);

@@ -22,7 +22,6 @@ import org.vividus.selenium.manager.WebDriverManagerParameter;
 
 public abstract class AbstractVividusDriverFactory implements IVividusDriverFactory
 {
-    @Inject private IWebDriverFactory webDriverFactory;
     @Inject private IBddRunContext bddRunContext;
     @Inject private IWebDriverManagerContext webDriverManagerContext;
     @Inject private IProxy proxy;
@@ -92,11 +91,6 @@ public abstract class AbstractVividusDriverFactory implements IVividusDriverFact
     {
         Meta storyMeta = story.getMeta();
         return scenario == null ? storyMeta : scenario.getMeta().inheritFrom(storyMeta);
-    }
-
-    protected IWebDriverFactory getWebDriverFactory()
-    {
-        return webDriverFactory;
     }
 
     public void setRemote(boolean remote)

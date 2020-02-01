@@ -13,6 +13,13 @@ dependencies {
     implementation project(':vividus-util')
     implementation project(':vividus-extension-selenium')
 
+    implementation(group: 'org.seleniumhq.selenium', name: 'selenium-chrome-driver', version: seleniumVersion)
+    implementation(group: 'org.seleniumhq.selenium', name: 'selenium-edge-driver', version: seleniumVersion)
+    implementation(group: 'org.seleniumhq.selenium', name: 'selenium-firefox-driver', version: seleniumVersion)
+    implementation(group: 'org.seleniumhq.selenium', name: 'selenium-ie-driver', version: seleniumVersion)
+    implementation(group: 'org.seleniumhq.selenium', name: 'selenium-safari-driver', version: seleniumVersion)
+    implementation(group: 'org.seleniumhq.selenium', name: 'selenium-opera-driver', version: seleniumVersion)
+
     api(group: 'ru.yandex.qatools.ashot', name: 'ashot', version: '1.5.4')
     api(group: 'com.github.crawler-commons', name: 'crawler-commons', version: '1.0')
     api(group: 'edu.uci.ics', name: 'crawler4j', version: '4.4.0')
