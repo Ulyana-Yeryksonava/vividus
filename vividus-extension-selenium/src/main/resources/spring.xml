@@ -34,17 +34,8 @@
         <property name="captureTypes" value="${proxy.capture-types}"/>
     </bean>
 
-    <bean id="timeoutConfigurer" class="org.vividus.selenium.TimeoutConfigurer">
-        <property name="pageLoadTimeout" value="${selenium.timeout.page-load-timeout}" />
-        <property name="pageLoadTimeoutTimeUnit" value="${selenium.timeout.page-load-timeout-unit}" />
-        <property name="asyncScriptTimeout" value="${selenium.timeout.async-script-timeout}" />
-        <property name="asyncScriptTimeoutTimeUnit" value="${selenium.timeout.async-script-timeout-unit}" />
-    </bean>
-
-    <bean id="webDriverFactory" class="org.vividus.selenium.WebDriverFactory">
-        <property name="webDriverType" value="${selenium.browser}" />
+    <bean id="driverFactory" class="org.vividus.selenium.DriverFactory">
         <property name="remoteDriverUrl" value="${selenium.grid.url}" />
-        <property name="jsonUtils" ref="jsonUtils-LowerCamelCase" />
     </bean>
 
     <bean id="remoteWebDriverFactory" class="org.vividus.selenium.RemoteWebDriverFactory" />
