@@ -23,14 +23,11 @@ import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.ScreenOrientation;
 import org.openqa.selenium.WebDriver;
-import org.vividus.selenium.BrowserWindowSize;
 import org.vividus.selenium.WebDriverType;
 
-public interface IWebDriverManager
+public interface IDriverManager
 {
     String NATIVE_APP_CONTEXT = "NATIVE_APP";
-
-    void resize(BrowserWindowSize browserWindowSize);
 
     Dimension getSize();
 

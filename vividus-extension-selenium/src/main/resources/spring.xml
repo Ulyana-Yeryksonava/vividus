@@ -40,7 +40,7 @@
 
     <bean id="remoteWebDriverFactory" class="org.vividus.selenium.RemoteWebDriverFactory" />
 
-    <bean id="webDriverManager" class="org.vividus.selenium.manager.WebDriverManager">
+    <bean id="driverManager" class="org.vividus.selenium.manager.DriverManager">
         <property name="nativeApp" value="${mobile-native-app}" />
     </bean>
  </beans>

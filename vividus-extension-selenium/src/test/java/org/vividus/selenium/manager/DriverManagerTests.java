@@ -23,7 +23,6 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
@@ -48,7 +47,6 @@ import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockSettings;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.openqa.selenium.Capabilities;
@@ -63,7 +61,6 @@ import org.openqa.selenium.WebDriver.Window;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.remote.BrowserType;
 import org.openqa.selenium.remote.CapabilityType;
-import org.vividus.selenium.BrowserWindowSize;
 import org.vividus.selenium.IWebDriverProvider;
 import org.vividus.selenium.SauceLabsCapabilityType;
 import org.vividus.selenium.WebDriverType;
@@ -74,7 +71,7 @@ import io.appium.java_client.remote.MobilePlatform;
 
 @SuppressWarnings({ "checkstyle:MethodCount", "PMD.GodClass"})
 @ExtendWith(MockitoExtension.class)
-class WebDriverManagerTests
+class DriverManagerTests
 {
     private static final String DESIREDCAPABILITIES_KEY = "desired";
     private static final String BROWSER_TYPE = "browser type";
@@ -93,7 +90,7 @@ class WebDriverManagerTests
     private MobileDriver<MobileElement> mobileDriver;
 
     @InjectMocks
-    private WebDriverManager webDriverManager;
+    private DriverManager driverManager;
 
     private HasCapabilities mockWebDriverWithCapabilities()
     {
@@ -123,13 +120,6 @@ class WebDriverManagerTests
         }
     }
 
-    private WebDriver mockWebDriver(Class<? extends WebDriver> webDriverClass, MockSettings mockSettings)
-    {
-        WebDriver webDriver = mock(webDriverClass, mockSettings);
-        when(webDriverProvider.get()).thenReturn(webDriver);
-        return webDriver;
-    }
-
     private Options mockOptions(WebDriver webDriver)
     {
         Options options = mock(Options.class);
@@ -145,78 +135,11 @@ class WebDriverManagerTests
         when(mobileDriver.getContextHandles()).thenReturn(returnContextHandles);
     }
 
-    private WebDriverManager spyIsMobile(boolean returnValue)
+    private DriverManager spyIsMobile(boolean returnValue)
     {
-        WebDriverManager spy = Mockito.spy(webDriverManager);
+        DriverManager spy = Mockito.spy(driverManager);
         doReturn(returnValue).when(spy).isMobile();
         return spy;
-    }
-
-    @Test
-    void testResizeWebDriverWithDesiredBrowserSize()
-    {
-        WebDriver webDriver = mockWebDriver(WebDriver.class, withSettings().extraInterfaces(HasCapabilities.class));
-        when(webDriverProvider.get()).thenReturn(webDriver);
-        BrowserWindowSize browserWindowSize = mock(BrowserWindowSize.class);
-        when(((HasCapabilities) webDriver).getCapabilities()).thenReturn(mock(Capabilities.class));
-        Window window = mock(Window.class);
-        when(mockOptions(webDriver).window()).thenReturn(window);
-        Dimension dimension = mock(Dimension.class);
-        when(browserWindowSize.toDimension()).thenReturn(dimension);
-        webDriverManager.resize(browserWindowSize);
-        verify(window).setSize(dimension);
-    }
-
-    @Test
-    void testResizeWebDriverWithNullBrowserSize()
-    {
-        WebDriver webDriver = mockWebDriver(WebDriver.class, withSettings().extraInterfaces(HasCapabilities.class));
-        when(webDriverProvider.get()).thenReturn(webDriver);
-        Window window = mock(Window.class);
-        when(mockOptions(webDriver).window()).thenReturn(window);
-        webDriverManager.resize(null);
-        verify(window).maximize();
-    }
-
-    @Test
-    void testResizeWebDriverWithNullBrowserSizeChrome()
-    {
-        WebDriverManager spy = Mockito.spy(webDriverManager);
-        WebDriver webDriver = mockWebDriver(WebDriver.class, withSettings().extraInterfaces(HasCapabilities.class));
-        when(webDriverProvider.get()).thenReturn(webDriver);
-        Window window = mock(Window.class);
-        when(mockOptions(webDriver).window()).thenReturn(window);
-        Dimension maxSize = new Dimension(1920, 1200);
-        when(window.getSize()).thenReturn(maxSize);
-        doReturn(true).when(spy).isBrowserAnyOf(BrowserType.CHROME);
-        spy.resize(null);
-        verify(window).maximize();
-        verify(window).setSize(maxSize);
-    }
-
-    @Test
-    void testResizeWebDriverWithNullBrowserSizeChromeAndroid()
-    {
-        WebDriverManager spy = Mockito.spy(webDriverManager);
-        WebDriver webDriver = mockWebDriver(WebDriver.class, withSettings().extraInterfaces(HasCapabilities.class));
-        Window window = mock(Window.class);
-        when(mockOptions(webDriver).window()).thenReturn(window);
-        doReturn(true).when(spy).isBrowserAnyOf(BrowserType.CHROME);
-        doReturn(true).when(spy).isAndroid();
-        spy.resize(null);
-        verify(window, never()).getSize();
-        verify(window, never()).setSize(any(Dimension.class));
-    }
-
-    @Test
-    void testResizeWebDriverDesiredBrowserSizeMobile()
-    {
-        WebDriver webDriver = mockWebDriver(WebDriver.class, withSettings().extraInterfaces(HasCapabilities.class));
-        when(webDriverProvider.get()).thenReturn(webDriver);
-        BrowserWindowSize browserWindowSize = mock(BrowserWindowSize.class);
-        when(mockCapabilities((HasCapabilities) webDriver).getBrowserName()).thenReturn(BrowserType.ANDROID);
-        webDriverManager.resize(browserWindowSize);
-        verify(webDriver, never()).manage();
     }
 
     @Test
@@ -230,7 +153,7 @@ class WebDriverManagerTests
         lenient().when(webDriverManagerContext.getParameter(WebDriverManagerParameter.SCREEN_SIZE)).thenReturn(null);
         lenient().when(webDriverManagerContext.getParameter(WebDriverManagerParameter.ORIENTATION))
                 .thenReturn(ScreenOrientation.PORTRAIT);
-        WebDriverManager spy = spyIsMobile(true);
+        DriverManager spy = spyIsMobile(true);
         Window window = mock(Window.class);
         when(mockOptions(mobileDriver).window()).thenReturn(window);
         when(window.getSize()).thenReturn(mock(Dimension.class));
@@ -242,7 +165,7 @@ class WebDriverManagerTests
     {
         WebDriver webDriverConfigured = mock(WebDriver.class);
         when(webDriverProvider.get()).thenReturn(webDriverConfigured);
-        WebDriverManager spy = spyIsMobile(false);
+        DriverManager spy = spyIsMobile(false);
         spy.performActionInNativeContext(webDriver -> assertEquals(webDriverConfigured, webDriver));
         verifyNoInteractions(webDriverConfigured);
     }
@@ -255,7 +178,7 @@ class WebDriverManagerTests
         contexts.add(WEBVIEW_CONTEXT);
         contexts.add(NATIVE_APP_CONTEXT);
         mockMobileDriverContext(mobileDriver, WEBVIEW_CONTEXT, contexts);
-        WebDriverManager spy = spyIsMobile(true);
+        DriverManager spy = spyIsMobile(true);
         spy.performActionInNativeContext(webDriver -> assertEquals(mobileDriver, webDriver));
         verify(mobileDriver).context(NATIVE_APP_CONTEXT);
         verify(mobileDriver).context(WEBVIEW_CONTEXT);
@@ -266,7 +189,7 @@ class WebDriverManagerTests
     {
         MobileDriver<?> mobileDriver = mock(MobileDriver.class, withSettings().extraInterfaces(HasCapabilities.class));
         mockMobileDriverContext(mobileDriver, WEBVIEW_CONTEXT, new HashSet<>());
-        WebDriverManager spy = spyIsMobile(true);
+        DriverManager spy = spyIsMobile(true);
         IllegalStateException exception = assertThrows(IllegalStateException.class,
             () -> spy.performActionInNativeContext(webDriver -> assertEquals(mobileDriver, webDriver)));
         assertEquals("MobileDriver doesn't have context: " + NATIVE_APP_CONTEXT, exception.getMessage());
@@ -277,7 +200,7 @@ class WebDriverManagerTests
     {
         when(webDriverProvider.getUnwrapped(MobileDriver.class)).thenReturn(mobileDriver);
         when(mobileDriver.getContext()).thenReturn(NATIVE_APP_CONTEXT);
-        WebDriverManager spy = spyIsMobile(true);
+        DriverManager spy = spyIsMobile(true);
         spy.performActionInNativeContext(webDriver -> assertEquals(mobileDriver, webDriver));
         verify(mobileDriver, never()).context(NATIVE_APP_CONTEXT);
         verify(mobileDriver, never()).getContextHandles();
@@ -288,7 +211,7 @@ class WebDriverManagerTests
     {
         HasCapabilities havingCapabilitiesWebDriver = mockWebDriverWithCapabilities();
         setCapabilities(havingCapabilitiesWebDriver, CapabilityType.PLATFORM_NAME, MobilePlatform.IOS);
-        assertTrue(webDriverManager.isMobile());
+        assertTrue(driverManager.isMobile());
     }
 
     @Test
@@ -296,7 +219,7 @@ class WebDriverManagerTests
     {
         HasCapabilities havingCapabilitiesWebDriver = mockWebDriverWithCapabilities();
         setCapabilities(havingCapabilitiesWebDriver, CapabilityType.PLATFORM_NAME, MobilePlatform.IOS);
-        assertTrue(webDriverManager.isIOS());
+        assertTrue(driverManager.isIOS());
     }
 
     @Test
@@ -304,7 +227,7 @@ class WebDriverManagerTests
     {
         HasCapabilities havingCapabilitiesWebDriver = mockWebDriverWithCapabilities();
         setCapabilities(havingCapabilitiesWebDriver, CapabilityType.PLATFORM_NAME, Platform.IOS);
-        assertTrue(webDriverManager.isIOS());
+        assertTrue(driverManager.isIOS());
     }
 
     @Test
@@ -312,7 +235,7 @@ class WebDriverManagerTests
     {
         HasCapabilities havingCapabilitiesWebDriver = mockWebDriverWithCapabilities();
         setCapabilities(havingCapabilitiesWebDriver, CapabilityType.PLATFORM_NAME, Platform.ANDROID);
-        assertFalse(webDriverManager.isIOS());
+        assertFalse(driverManager.isIOS());
     }
 
     @Test
@@ -321,7 +244,7 @@ class WebDriverManagerTests
         HasCapabilities havingCapabilitiesWebDriver = mockWebDriverWithCapabilities();
         setCapabilities(havingCapabilitiesWebDriver, CapabilityType.PLATFORM_NAME, Platform.MAC.toString());
         setCapabilities(havingCapabilitiesWebDriver, BROWSER_TYPE, BrowserType.IPAD);
-        assertTrue(webDriverManager.isIOS());
+        assertTrue(driverManager.isIOS());
     }
 
     @Test
@@ -330,7 +253,7 @@ class WebDriverManagerTests
         HasCapabilities havingCapabilitiesWebDriver = mockWebDriverWithCapabilities();
         setCapabilities(havingCapabilitiesWebDriver, CapabilityType.PLATFORM_NAME, Platform.MAC.toString());
         setCapabilities(havingCapabilitiesWebDriver, BROWSER_TYPE, BrowserType.IPHONE);
-        assertTrue(webDriverManager.isIOS());
+        assertTrue(driverManager.isIOS());
     }
 
     @Test
@@ -338,7 +261,7 @@ class WebDriverManagerTests
     {
         HasCapabilities havingCapabilitiesWebDriver = mockWebDriverWithCapabilities();
         setCapabilities(havingCapabilitiesWebDriver, CapabilityType.PLATFORM_NAME, MobilePlatform.ANDROID);
-        assertFalse(webDriverManager.isIOS());
+        assertFalse(driverManager.isIOS());
     }
 
     @Test
@@ -348,7 +271,7 @@ class WebDriverManagerTests
         map.put(SauceLabsCapabilityType.DEVICE, BrowserType.IPHONE);
         HasCapabilities havingCapabilitiesWebDriver = mockWebDriverWithCapabilities();
         setCapabilities(havingCapabilitiesWebDriver, SauceLabsCapabilityType.CAPABILITIES, map);
-        assertTrue(webDriverManager.isIOS());
+        assertTrue(driverManager.isIOS());
     }
 
     @Test
@@ -356,7 +279,7 @@ class WebDriverManagerTests
     {
         HasCapabilities havingCapabilitiesWebDriver = mockWebDriverWithCapabilities();
         setCapabilities(havingCapabilitiesWebDriver, SauceLabsCapabilityType.DEVICE, BrowserType.IPHONE);
-        assertTrue(webDriverManager.isIOS());
+        assertTrue(driverManager.isIOS());
     }
 
     @Test
@@ -364,7 +287,7 @@ class WebDriverManagerTests
     {
         HasCapabilities havingCapabilitiesWebDriver = mockWebDriverWithCapabilities();
         setCapabilities(havingCapabilitiesWebDriver, CapabilityType.PLATFORM_NAME, MobilePlatform.ANDROID);
-        assertTrue(webDriverManager.isAndroid());
+        assertTrue(driverManager.isAndroid());
     }
 
     @Test
@@ -372,7 +295,7 @@ class WebDriverManagerTests
     {
         HasCapabilities havingCapabilitiesWebDriver = mockWebDriverWithCapabilities();
         setCapabilities(havingCapabilitiesWebDriver, CapabilityType.PLATFORM_NAME, MobilePlatform.ANDROID);
-        assertTrue(webDriverManager.isMobile());
+        assertTrue(driverManager.isMobile());
     }
 
     @Test
@@ -380,7 +303,7 @@ class WebDriverManagerTests
     {
         HasCapabilities havingCapabilitiesWebDriver = mockWebDriverWithCapabilities();
         setCapabilities(havingCapabilitiesWebDriver, BROWSER_TYPE, BrowserType.ANDROID);
-        assertTrue(webDriverManager.isMobile());
+        assertTrue(driverManager.isMobile());
     }
 
     @Test
@@ -390,7 +313,7 @@ class WebDriverManagerTests
         Capabilities androidCapabilities = mock(Capabilities.class);
         when(havingCapabilitiesWebDriver.getCapabilities()).thenReturn(androidCapabilities);
         setCapabilities(havingCapabilitiesWebDriver, BROWSER_TYPE, BrowserType.ANDROID);
-        assertTrue(webDriverManager.isAndroid());
+        assertTrue(driverManager.isAndroid());
     }
 
     @Test
@@ -402,7 +325,7 @@ class WebDriverManagerTests
         lenient().when(androidCapabilities.getCapability(DESIREDCAPABILITIES_KEY)).thenReturn(Collections.emptyMap());
         lenient().when(androidCapabilities.getCapability(CapabilityType.PLATFORM_NAME))
                 .thenReturn(MobilePlatform.ANDROID);
-        assertTrue(webDriverManager.isAndroid());
+        assertTrue(driverManager.isAndroid());
     }
 
     @Test
@@ -415,7 +338,7 @@ class WebDriverManagerTests
                 .thenReturn(Collections.singletonMap(CapabilityType.PLATFORM_NAME, "android"));
         lenient().when(androidCapabilities.getCapability(CapabilityType.PLATFORM_NAME))
                 .thenReturn(MobilePlatform.ANDROID);
-        assertTrue(webDriverManager.isAndroid());
+        assertTrue(driverManager.isAndroid());
     }
 
     @Test
@@ -427,7 +350,7 @@ class WebDriverManagerTests
         lenient().when(androidCapabilities.getCapability(DESIREDCAPABILITIES_KEY)).thenReturn("DesiredAndroid");
         lenient().when(androidCapabilities.getCapability(CapabilityType.PLATFORM_NAME))
                 .thenReturn(MobilePlatform.ANDROID);
-        assertTrue(webDriverManager.isAndroid());
+        assertTrue(driverManager.isAndroid());
     }
 
     @Test
@@ -435,7 +358,7 @@ class WebDriverManagerTests
     {
         HasCapabilities havingCapabilitiesWebDriver = mockWebDriverWithCapabilities();
         setCapabilities(havingCapabilitiesWebDriver, BROWSER_TYPE, BrowserType.CHROME);
-        assertFalse(webDriverManager.isAndroid());
+        assertFalse(driverManager.isAndroid());
     }
 
     @Test
@@ -445,7 +368,7 @@ class WebDriverManagerTests
         setCapabilities(havingCapabilitiesWebDriver, SauceLabsCapabilityType.DEVICE_NAME, null);
         setCapabilities(havingCapabilitiesWebDriver, CapabilityType.PLATFORM_NAME, Platform.LINUX.toString());
         setCapabilities(havingCapabilitiesWebDriver, BROWSER_TYPE, BrowserType.CHROME);
-        assertFalse(webDriverManager.isMobile());
+        assertFalse(driverManager.isMobile());
     }
 
     // CHECKSTYLE:OFF
@@ -490,7 +413,7 @@ class WebDriverManagerTests
     {
         HasCapabilities havingCapabilitiesWebDriver = mockWebDriverWithCapabilities();
         setCapabilities(havingCapabilitiesWebDriver, BROWSER_TYPE, browserName);
-        assertEquals(result, webDriverManager.isTypeAnyOf(webDriverType));
+        assertEquals(result, driverManager.isTypeAnyOf(webDriverType));
     }
 
     @ParameterizedTest
@@ -499,7 +422,7 @@ class WebDriverManagerTests
     {
         HasCapabilities havingCapabilitiesWebDriver = mockWebDriverWithCapabilities();
         setCapabilities(havingCapabilitiesWebDriver, BROWSER_TYPE, browserName);
-        assertEquals(webDriverType, webDriverManager.detectType());
+        assertEquals(webDriverType, driverManager.detectType());
     }
 
     @Test
@@ -508,7 +431,7 @@ class WebDriverManagerTests
         String browserName = "chrome";
         HasCapabilities havingCapabilitiesWebDriver = mockWebDriverWithCapabilities();
         setCapabilities(havingCapabilitiesWebDriver, BROWSER_TYPE, browserName);
-        assertTrue(webDriverManager.isBrowserAnyOf(BrowserType.CHROME));
+        assertTrue(driverManager.isBrowserAnyOf(BrowserType.CHROME));
     }
 
     @Test
@@ -517,61 +440,61 @@ class WebDriverManagerTests
         String browserName = "browser";
         HasCapabilities havingCapabilitiesWebDriver = mockWebDriverWithCapabilities();
         setCapabilities(havingCapabilitiesWebDriver, BROWSER_TYPE, browserName);
-        assertFalse(webDriverManager.isBrowserAnyOf(BrowserType.CHROME));
+        assertFalse(driverManager.isBrowserAnyOf(BrowserType.CHROME));
     }
 
     @Test
     void shouldBeAndroidNativeApp()
     {
-        webDriverManager.setNativeApp(true);
+        driverManager.setNativeApp(true);
         MobileDriver<?> webDriver = mock(MobileDriver.class, withSettings().extraInterfaces(HasCapabilities.class));
         when(webDriverProvider.get()).thenReturn(webDriver);
         setCapabilities((HasCapabilities) webDriver, CapabilityType.PLATFORM_NAME, MobilePlatform.ANDROID);
-        assertTrue(webDriverManager.isAndroidNativeApp());
+        assertTrue(driverManager.isAndroidNativeApp());
     }
 
     @Test
     void shouldNotBeAndroidNativeApp()
     {
-        webDriverManager.setNativeApp(false);
-        assertFalse(webDriverManager.isAndroidNativeApp());
+        driverManager.setNativeApp(false);
+        assertFalse(driverManager.isAndroidNativeApp());
     }
 
     @Test
     void shouldNotBeAndroidNativeAppAsItIsIOS()
     {
-        webDriverManager.setNativeApp(true);
+        driverManager.setNativeApp(true);
         MobileDriver<?> webDriver = mock(MobileDriver.class, withSettings().extraInterfaces(HasCapabilities.class));
         when(webDriverProvider.get()).thenReturn(webDriver);
         setCapabilities((HasCapabilities) webDriver, CapabilityType.PLATFORM_NAME, MobilePlatform.IOS);
-        assertFalse(webDriverManager.isAndroidNativeApp());
+        assertFalse(driverManager.isAndroidNativeApp());
     }
 
     @Test
     void shouldBeIOSNativeApp()
     {
-        webDriverManager.setNativeApp(true);
+        driverManager.setNativeApp(true);
         MobileDriver<?> webDriver = mock(MobileDriver.class, withSettings().extraInterfaces(HasCapabilities.class));
         when(webDriverProvider.get()).thenReturn(webDriver);
         setCapabilities((HasCapabilities) webDriver, CapabilityType.PLATFORM_NAME, MobilePlatform.IOS);
-        assertTrue(webDriverManager.isIOSNativeApp());
+        assertTrue(driverManager.isIOSNativeApp());
     }
 
     @Test
     void shouldNotBeIOSNativeApp()
     {
-        webDriverManager.setNativeApp(false);
-        assertFalse(webDriverManager.isIOSNativeApp());
+        driverManager.setNativeApp(false);
+        assertFalse(driverManager.isIOSNativeApp());
     }
 
     @Test
     void shouldNotBeIOSNativeAppAsItIsAndroid()
     {
-        webDriverManager.setNativeApp(true);
+        driverManager.setNativeApp(true);
         MobileDriver<?> webDriver = mock(MobileDriver.class, withSettings().extraInterfaces(HasCapabilities.class));
         when(webDriverProvider.get()).thenReturn(webDriver);
         setCapabilities((HasCapabilities) webDriver, CapabilityType.PLATFORM_NAME, MobilePlatform.ANDROID);
-        assertFalse(webDriverManager.isIOSNativeApp());
+        assertFalse(driverManager.isIOSNativeApp());
     }
 
     @ParameterizedTest
@@ -580,7 +503,7 @@ class WebDriverManagerTests
     {
         when(webDriverProvider.get()).thenReturn(mobileDriver);
         setCapabilities((HasCapabilities) mobileDriver, CapabilityType.PLATFORM_NAME, Platform.WIN10.toString());
-        assertFalse(webDriverManager.isOrientation(orientation));
+        assertFalse(driverManager.isOrientation(orientation));
     }
 
     static Stream<Arguments> orientationProvider()
@@ -606,7 +529,7 @@ class WebDriverManagerTests
         when(webDriverManagerContext.getParameter(WebDriverManagerParameter.ORIENTATION)).thenReturn(null);
         when(mobileDriver.getOrientation()).thenReturn(actualOrientation);
         setCapabilities((HasCapabilities) mobileDriver, CapabilityType.PLATFORM_NAME, platform);
-        assertEquals(actualOrientation == orientationToCheck, webDriverManager.isOrientation(orientationToCheck));
+        assertEquals(actualOrientation == orientationToCheck, driverManager.isOrientation(orientationToCheck));
         verify(webDriverManagerContext).putParameter(WebDriverManagerParameter.ORIENTATION, actualOrientation);
     }
 
@@ -617,7 +540,7 @@ class WebDriverManagerTests
         setCapabilities(havingCapabilitiesWebDriver, CapabilityType.PLATFORM_NAME, MobilePlatform.IOS);
         when(webDriverManagerContext.getParameter(WebDriverManagerParameter.ORIENTATION))
                 .thenReturn(ScreenOrientation.PORTRAIT);
-        assertTrue(webDriverManager.isOrientation(ScreenOrientation.PORTRAIT));
+        assertTrue(driverManager.isOrientation(ScreenOrientation.PORTRAIT));
         verifyNoInteractions(mobileDriver);
     }
 
@@ -638,7 +561,7 @@ class WebDriverManagerTests
         lenient().when(webDriverProvider.getUnwrapped(Rotatable.class)).thenReturn(mobileDriver);
         when(mobileDriver.getOrientation()).thenReturn(orientation);
         when(mobileDriver.getContext()).thenReturn(NATIVE_APP_CONTEXT);
-        WebDriverManager spy = spyIsMobile(true);
+        DriverManager spy = spyIsMobile(true);
         Options options = mock(Options.class);
         when(mobileDriver.manage()).thenReturn(options);
         Window window = mock(Window.class);
@@ -659,7 +582,7 @@ class WebDriverManagerTests
         Dimension dimension = new Dimension(375, 667);
         lenient().when(webDriverManagerContext.getParameter(WebDriverManagerParameter.SCREEN_SIZE))
                 .thenReturn(dimension);
-        Dimension actualDimension = webDriverManager.getSize();
+        Dimension actualDimension = driverManager.getSize();
         assertEquals(dimension.getHeight(), actualDimension.getHeight());
         assertEquals(dimension.getWidth(), actualDimension.getWidth());
         verify(mobileDriver, never()).manage();
@@ -671,7 +594,7 @@ class WebDriverManagerTests
         HasCapabilities havingCapabilitiesWebDriver = mockWebDriverWithCapabilities();
         setCapabilities(havingCapabilitiesWebDriver, CapabilityType.PLATFORM_NAME, MobilePlatform.ANDROID);
         when(((WebDriver) havingCapabilitiesWebDriver).getWindowHandles()).thenReturn(WINDOW_HANDLES);
-        assertEquals(WINDOW_HANDLES, webDriverManager.getWindowHandles());
+        assertEquals(WINDOW_HANDLES, driverManager.getWindowHandles());
     }
 
     @Test
@@ -680,7 +603,7 @@ class WebDriverManagerTests
         HasCapabilities havingCapabilitiesWebDriver = mockWebDriverWithCapabilities();
         setCapabilities(havingCapabilitiesWebDriver, CapabilityType.PLATFORM_NAME, MobilePlatform.IOS);
         when(((WebDriver) havingCapabilitiesWebDriver).getWindowHandles()).thenReturn(WINDOW_HANDLES);
-        assertEquals(WINDOW_HANDLES, webDriverManager.getWindowHandles());
+        assertEquals(WINDOW_HANDLES, driverManager.getWindowHandles());
     }
 
     @Test
@@ -692,7 +615,7 @@ class WebDriverManagerTests
         when(((WebDriver) havingCapabilitiesWebDriver).getWindowHandles())
                 .thenThrow(new WebDriverException(exceptionMessage));
         WebDriverException exception = assertThrows(WebDriverException.class,
-            () -> webDriverManager.getWindowHandles());
+            () -> driverManager.getWindowHandles());
         assertThat(exception.getMessage(), containsString(exceptionMessage));
     }
 
@@ -704,7 +627,7 @@ class WebDriverManagerTests
         when(((WebDriver) havingCapabilitiesWebDriver).getWindowHandles())
                 .thenThrow(new WebDriverException(COULD_NOT_CONNECT_TO_APP));
         WebDriverException exception = assertThrows(WebDriverException.class,
-            () -> webDriverManager.getWindowHandles());
+            () -> driverManager.getWindowHandles());
         assertThat(exception.getMessage(), containsString(COULD_NOT_CONNECT_TO_APP));
     }
 }

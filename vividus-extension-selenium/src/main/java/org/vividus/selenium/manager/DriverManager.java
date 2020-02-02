@@ -34,12 +34,10 @@ import org.openqa.selenium.Platform;
 import org.openqa.selenium.Rotatable;
 import org.openqa.selenium.ScreenOrientation;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebDriver.Window;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.remote.BrowserType;
 import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.DesiredCapabilities;
-import org.vividus.selenium.BrowserWindowSize;
 import org.vividus.selenium.IWebDriverProvider;
 import org.vividus.selenium.SauceLabsCapabilityType;
 import org.vividus.selenium.WebDriverType;
@@ -50,7 +48,7 @@ import io.appium.java_client.MobileDriver;
 import io.appium.java_client.MobileElement;
 import io.appium.java_client.remote.MobilePlatform;
 
-public class WebDriverManager implements IWebDriverManager
+public class DriverManager implements IDriverManager
 {
     private static final int GET_WINDOW_HANDLE_RETRIES = 5;
     private static final Duration GET_WINDOW_HANDLE_SLEEP_DURATION = Duration.ofMillis(500);
@@ -60,37 +58,6 @@ public class WebDriverManager implements IWebDriverManager
     @Inject private IWebDriverProvider webDriverProvider;
     @Inject private IWebDriverManagerContext webDriverManagerContext;
     private boolean nativeApp;
-
-    @Override
-    public void resize(BrowserWindowSize browserWindowSize)
-    {
-        resize(getWebDriver(), browserWindowSize);
-        // Chrome-only workaround for situations when custom browser viewport size was set before 'window.maximize();'
-        // and it prevents following window-resizing actions
-        // Reported issue: https://bugs.chromium.org/p/chromedriver/issues/detail?id=1638
-        if (isBrowserAnyOf(BrowserType.CHROME) && !isAndroid())
-        {
-            Window window = getWebDriver().manage().window();
-            Dimension size = window.getSize();
-            window.setSize(size);
-        }
-    }
-
-    public static void resize(WebDriver webDriver, BrowserWindowSize browserWindowSize)
-    {
-        if (!isMobile(WebDriverUtil.unwrap(webDriver, HasCapabilities.class).getCapabilities()))
-        {
-            Window window = webDriver.manage().window();
-            if (browserWindowSize == null)
-            {
-                window.maximize();
-            }
-            else
-            {
-                window.setSize(browserWindowSize.toDimension());
-            }
-        }
-    }
 
     @Override
     public Dimension getSize()
@@ -166,7 +133,7 @@ public class WebDriverManager implements IWebDriverManager
         return isMobile(getCapabilities());
     }
 
-    private static boolean isMobile(Capabilities capabilities)
+    public static boolean isMobile(Capabilities capabilities)
     {
         return isIOS(capabilities) || isAndroid(capabilities);
     }

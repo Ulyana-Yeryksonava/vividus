@@ -385,6 +385,8 @@
         <property name="webDriverEventListeners" ref="webDriverEventListener-EventHandlers" />
     </bean>
 
+    <bean id="webDriverManager" class="org.vividus.selenium.manager.WebDriverManager" parent="driverManager" primary="true"/>
+
     <util:list id="stepBeanNames-WebUi" value-type="java.lang.String">
         <value>alertSteps</value>
         <value>cookieSteps</value>
