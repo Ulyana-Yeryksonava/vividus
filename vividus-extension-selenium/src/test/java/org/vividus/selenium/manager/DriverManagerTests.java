@@ -63,7 +63,6 @@ import org.openqa.selenium.remote.BrowserType;
 import org.openqa.selenium.remote.CapabilityType;
 import org.vividus.selenium.IWebDriverProvider;
 import org.vividus.selenium.SauceLabsCapabilityType;
-import org.vividus.selenium.WebDriverType;
 
 import io.appium.java_client.MobileDriver;
 import io.appium.java_client.MobileElement;
@@ -369,60 +368,6 @@ class DriverManagerTests
         setCapabilities(havingCapabilitiesWebDriver, CapabilityType.PLATFORM_NAME, Platform.LINUX.toString());
         setCapabilities(havingCapabilitiesWebDriver, BROWSER_TYPE, BrowserType.CHROME);
         assertFalse(driverManager.isMobile());
-    }
-
-    // CHECKSTYLE:OFF
-    static Stream<Arguments> webDriverTypeChecks()
-    {
-        return Stream.of(
-            Arguments.of(BrowserType.FIREFOX,         WebDriverType.FIREFOX,      true   ),
-            Arguments.of(BrowserType.FIREFOX_CHROME,  WebDriverType.FIREFOX,      false  ),
-            Arguments.of(BrowserType.CHROME,          WebDriverType.CHROME,       true   ),
-            Arguments.of(BrowserType.FIREFOX_CHROME,  WebDriverType.CHROME,       false  ),
-            Arguments.of(BrowserType.EDGE,            WebDriverType.EDGE,         true   ),
-            Arguments.of(BrowserType.IE,              WebDriverType.EDGE,         false  ),
-            Arguments.of(BrowserType.IEXPLORE,        WebDriverType.IEXPLORE,     true   ),
-            Arguments.of(BrowserType.IE_HTA,          WebDriverType.IEXPLORE,     false  ),
-            Arguments.of(BrowserType.SAFARI,          WebDriverType.SAFARI,       true   ),
-            Arguments.of(BrowserType.SAFARI_PROXY,    WebDriverType.SAFARI,       true   ),
-            Arguments.of(BrowserType.IPHONE,          WebDriverType.SAFARI,       false  )
-        );
-    }
-
-    static Stream<Arguments> webDriverTypeDetections()
-    {
-        return Stream.of(
-            Arguments.of(BrowserType.FIREFOX,         WebDriverType.FIREFOX   ),
-            Arguments.of(BrowserType.FIREFOX_CHROME,  null                    ),
-            Arguments.of(BrowserType.CHROME,          WebDriverType.CHROME    ),
-            Arguments.of(BrowserType.FIREFOX_CHROME,  null                    ),
-            Arguments.of(BrowserType.EDGE,            WebDriverType.EDGE      ),
-            Arguments.of(BrowserType.IE,              WebDriverType.IEXPLORE  ),
-            Arguments.of(BrowserType.IEXPLORE,        WebDriverType.IEXPLORE  ),
-            Arguments.of(BrowserType.IE_HTA,          null                    ),
-            Arguments.of(BrowserType.SAFARI,          WebDriverType.SAFARI    ),
-            Arguments.of(BrowserType.SAFARI_PROXY,    WebDriverType.SAFARI    ),
-            Arguments.of(BrowserType.IPHONE,          null                    )
-        );
-    }
-    // CHECKSTYLE:ON
-
-    @ParameterizedTest
-    @MethodSource("webDriverTypeChecks")
-    void testIsTypeAnyOf(String browserName, WebDriverType webDriverType, boolean result)
-    {
-        HasCapabilities havingCapabilitiesWebDriver = mockWebDriverWithCapabilities();
-        setCapabilities(havingCapabilitiesWebDriver, BROWSER_TYPE, browserName);
-        assertEquals(result, driverManager.isTypeAnyOf(webDriverType));
-    }
-
-    @ParameterizedTest
-    @MethodSource("webDriverTypeDetections")
-    void testDetectType(String browserName, WebDriverType webDriverType)
-    {
-        HasCapabilities havingCapabilitiesWebDriver = mockWebDriverWithCapabilities();
-        setCapabilities(havingCapabilitiesWebDriver, BROWSER_TYPE, browserName);
-        assertEquals(webDriverType, driverManager.detectType());
     }
 
     @Test

@@ -23,7 +23,6 @@ import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.ScreenOrientation;
 import org.openqa.selenium.WebDriver;
-import org.vividus.selenium.WebDriverType;
 
 public interface IDriverManager
 {
@@ -38,10 +37,6 @@ public interface IDriverManager
     boolean isIOS();
 
     boolean isAndroid();
-
-    boolean isTypeAnyOf(WebDriverType... webDriverTypes);
-
-    WebDriverType detectType();
 
     boolean isBrowserAnyOf(String... browserTypes);
 

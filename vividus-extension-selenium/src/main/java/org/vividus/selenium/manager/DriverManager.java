@@ -40,7 +40,6 @@ import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.vividus.selenium.IWebDriverProvider;
 import org.vividus.selenium.SauceLabsCapabilityType;
-import org.vividus.selenium.WebDriverType;
 import org.vividus.selenium.WebDriverUtil;
 import org.vividus.util.Sleeper;
 
@@ -174,36 +173,12 @@ public class DriverManager implements IDriverManager
     }
 
     @Override
-    public boolean isTypeAnyOf(WebDriverType... webDriverTypes)
-    {
-        return isTypeAnyOf(getWebDriver(), webDriverTypes);
-    }
-
-    public static boolean isTypeAnyOf(WebDriver webDriver, WebDriverType... webDriverTypes)
-    {
-        Capabilities capabilities = getCapabilities(webDriver);
-        return Stream.of(webDriverTypes).anyMatch(type -> isBrowserAnyOf(capabilities, type.getBrowserNames()));
-    }
-
-    @Override
-    public WebDriverType detectType()
-    {
-        return detectType(getCapabilities());
-    }
-
-    public static WebDriverType detectType(Capabilities capabilities)
-    {
-        return Stream.of(WebDriverType.values()).filter(type -> isBrowserAnyOf(capabilities, type.getBrowserNames()))
-                .findFirst().orElse(null);
-    }
-
-    @Override
     public boolean isBrowserAnyOf(String... browserTypes)
     {
         return isBrowserAnyOf(getCapabilities(), browserTypes);
     }
 
-    private static boolean isBrowserAnyOf(Capabilities capabilities, String... browserNames)
+    public static boolean isBrowserAnyOf(Capabilities capabilities, String... browserNames)
     {
         return checkCapabilities(capabilities, () ->
         {
@@ -271,7 +246,7 @@ public class DriverManager implements IDriverManager
         return getCapabilities(getWebDriver());
     }
 
-    private static Capabilities getCapabilities(WebDriver webDriver)
+    public static Capabilities getCapabilities(WebDriver webDriver)
     {
         return WebDriverUtil.unwrap(webDriver, HasCapabilities.class).getCapabilities();
     }

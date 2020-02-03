@@ -16,8 +16,14 @@
 
 package org.vividus.selenium.manager;
 
+import static org.vividus.selenium.manager.DriverManager.getCapabilities;
+import static org.vividus.selenium.manager.DriverManager.isBrowserAnyOf;
+
+import java.util.stream.Stream;
+
 import javax.inject.Inject;
 
+import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.HasCapabilities;
 import org.openqa.selenium.WebDriver;
@@ -25,6 +31,7 @@ import org.openqa.selenium.WebDriver.Window;
 import org.openqa.selenium.remote.BrowserType;
 import org.vividus.selenium.BrowserWindowSize;
 import org.vividus.selenium.IWebDriverProvider;
+import org.vividus.selenium.WebDriverType;
 import org.vividus.selenium.WebDriverUtil;
 
 public class WebDriverManager extends DriverManager implements IWebDriverManager
@@ -61,5 +68,34 @@ public class WebDriverManager extends DriverManager implements IWebDriverManager
                 window.setSize(browserWindowSize.toDimension());
             }
         }
+    }
+
+    @Override
+    public boolean isTypeAnyOf(WebDriverType... webDriverTypes)
+    {
+        return isTypeAnyOf(getWebDriver(), webDriverTypes);
+    }
+
+    @Override
+    public WebDriverType detectType()
+    {
+        return detectType(getCapabilities());
+    }
+
+    public static boolean isTypeAnyOf(WebDriver webDriver, WebDriverType... webDriverTypes)
+    {
+        Capabilities capabilities = getCapabilities(webDriver);
+        return Stream.of(webDriverTypes).anyMatch(type -> isBrowserAnyOf(capabilities, type.getBrowserNames()));
+    }
+
+    public static WebDriverType detectType(Capabilities capabilities)
+    {
+        return Stream.of(WebDriverType.values()).filter(type -> isBrowserAnyOf(capabilities, type.getBrowserNames()))
+                .findFirst().orElse(null);
+    }
+
+    private WebDriver getWebDriver()
+    {
+        return webDriverProvider.get();
     }
 }

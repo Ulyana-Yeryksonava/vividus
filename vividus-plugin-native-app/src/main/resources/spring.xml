@@ -5,7 +5,7 @@
        xsi:schemaLocation="
         http://www.springframework.org/schema/beans https://www.springframework.org/schema/beans/spring-beans.xsd
         http://www.springframework.org/schema/util https://www.springframework.org/schema/util/spring-util.xsd"
-        default-lazy-init="true" profile="native">
+        default-lazy-init="true" profile="mobile_app">
 
     <bean id="applicationSteps" class="org.vividus.bdd.steps.ApplicationSteps" >
         <constructor-arg index="0" ref="jsonUtils-LowerCamelCase"/>

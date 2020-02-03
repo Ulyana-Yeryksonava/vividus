@@ -17,8 +17,13 @@
 package org.vividus.selenium.manager;
 
 import org.vividus.selenium.BrowserWindowSize;
+import org.vividus.selenium.WebDriverType;
 
 public interface IWebDriverManager extends IDriverManager
 {
     void resize(BrowserWindowSize browserWindowSize);
+
+    boolean isTypeAnyOf(WebDriverType... webDriverTypes);
+
+    WebDriverType detectType();
 }

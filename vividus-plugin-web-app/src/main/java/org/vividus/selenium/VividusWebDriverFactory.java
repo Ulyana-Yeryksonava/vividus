@@ -56,6 +56,7 @@ public class VividusWebDriverFactory extends AbstractVividusDriverFactory
         vividusWebDriver.setRemote(remoteExecution);
     }
 
+    @Override
     protected void setDesiredCapabilities(DesiredCapabilities desiredCapabilities, RunningStory runningStory,
             Scenario scenario, MetaWrapper metaWrapper)
     {
